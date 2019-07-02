@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
+import {configure} from "mobx";
+configure({ enforceActions:'observed'});
+
+import App from './App/App';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
