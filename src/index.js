@@ -1,15 +1,40 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import * as serviceWorker from './serviceWorker';
-import {configure} from "mobx";
-configure({ enforceActions:'observed'});
 
 import App from './App/App';
+import './index.css';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import * as Colors from 'material-ui/styles/colors';
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const muiTheme = getMuiTheme({
+    palette: {
+        primary1Color: Colors.teal400,
+        primary2Color: Colors.orange300,
+        primary3Color: Colors.grey400,
+        accent1Color: Colors.pinkA200,
+        accent2Color: Colors.grey100,
+        accent3Color: Colors.grey500,
+        textColor: Colors.grey900,
+        alternateTextColor: Colors.orange300,
+        canvasColor: Colors.white,
+        borderColor: Colors.grey300
+    },
+    appBar: {
+        height: 50,
+    },
+    raisedButton: {
+        primaryTextColor: Colors.white
+    },
+    card: {
+        titleColor: Colors.grey500
+    }
+
+});
+
+ReactDOM.render(
+    <MuiThemeProvider muiTheme={muiTheme}>
+        <App />
+    </MuiThemeProvider>, document.getElementById('root')
+    );
