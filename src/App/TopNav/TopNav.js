@@ -9,7 +9,6 @@ const TopNav = observer(class TopNav extends Component {
             <AppBar 
                 title={"Learning Pictures"}
                 iconElementRight={<FlatButton label="Español" />}
-                style={{ position: "fixed" , background: "white", border:"none"}}
             />
     );
   }

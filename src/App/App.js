@@ -5,8 +5,6 @@ import TopNav from './TopNav/TopNav';
 import store from './App.store';
 import Content from './Content/Content';
 
-import './App.css';
-
 const App = observer(class App extends Component {
   render() {
     return (
