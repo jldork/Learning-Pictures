@@ -19,12 +19,11 @@ const getInitialrecords = () => {
   const numRows = 200;
 
   for (let i = 0; i < numRows; i++) {
-    records.push(makeRow(i+1))
+    records.push(makeRow(i + 1))
   }
 
   return records
 }
-
 
 class AppStore {
   name = "";

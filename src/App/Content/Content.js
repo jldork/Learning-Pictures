@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import ReactDataSheet from 'react-datasheet';
+import Graph from './Graph/Graph';
 import 'react-datasheet/lib/react-datasheet.css';
 
 const Content = inject('store')(
@@ -19,7 +20,7 @@ const Content = inject('store')(
             return (
                 <Grid container id="content-container">
                     <Grid item id="content-left" >
-                        <Paper square="true" className="sheet-container">
+                        <Paper square={true} className="sheet-container">
                                 <ReactDataSheet
                                     data={this.props.store.records}
                                     valueRenderer={(cell) => cell.value}
@@ -29,7 +30,7 @@ const Content = inject('store')(
                         </Paper>
                         </Grid>
                     <Grid item id="content-right" >
-
+                        <Graph />
                     </Grid>
                 </Grid>
             )

@@ -13,9 +13,9 @@ const TopNav = observer(class TopNav extends Component {
     return (
       <AppBar position="static">
         <Toolbar>
-          <Grid container spacing={24} justify="space-between" alignItems="center">
+          <Grid container justify="space-between" alignItems="center">
             <Grid item >
-              <Grid container flexDirection="row">
+              <Grid container flexdirection="row">
                 <IconButton edge="start" color="inherit" aria-label="Menu">
                   <MenuIcon />
                 </IconButton>

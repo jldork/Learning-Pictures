@@ -13,7 +13,7 @@ body {
 #content-left {
   background-color: #1F2E56;
   padding: 10px;
-  width: 50%;
+  min-width: 20%;
   min-height: 1000px;
 }
 
@@ -21,6 +21,12 @@ body {
   padding: 10px;
 }
 .data-grid-container .data-grid .cell {
-  width: 10%;
+  min-width: 5%;
   text-align: center;
+}
+
+/* Content Right */
+#content-right {
+  padding: 10px;
+  width: 50%;
 }
