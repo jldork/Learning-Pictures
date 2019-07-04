@@ -1,15 +1,33 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import AppBar from 'material-ui/AppBar';
-import FlatButton from 'material-ui/FlatButton';
+
+import Grid from '@material-ui/core/Grid';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
 
 const TopNav = observer(class TopNav extends Component {
   render() {
     return (
-            <AppBar 
-                title={"Learning Pictures"}
-                iconElementRight={<FlatButton label="Español" />}
-            />
+      <AppBar position="static">
+        <Toolbar>
+          <Grid container spacing={24} justify="space-between" alignItems="center">
+            <Grid item >
+              <Grid container flexDirection="row">
+                <IconButton edge="start" color="inherit" aria-label="Menu">
+                  <MenuIcon />
+                </IconButton>
+                <h3> Learning Pictures</h3>
+              </Grid>
+            </Grid>
+            <Grid item>
+              <Button color="inherit" edge="end" >Login</Button>
+            </Grid>
+          </Grid>
+        </Toolbar>
+      </AppBar >
     );
   }
 })

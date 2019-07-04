@@ -1,3 +1,4 @@
+/* CSS RESET */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -7,7 +8,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+
+/* Content Left */
+#content-left {
+  background-color: #1F2E56;
+  padding: 10px;
+  width: 50%;
+  min-height: 1000px;
+}
+
+.sheet-container {
+  padding: 10px;
+}
+.data-grid-container .data-grid .cell {
+  width: 10%;
+  text-align: center;
 }
