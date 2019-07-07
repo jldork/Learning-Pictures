@@ -1,4 +1,5 @@
 import { observable, action, decorate } from "mobx";
+import * as moment from "moment";
 
 const getInitialrecords = () => {
   //   Columns    
@@ -16,7 +17,7 @@ const getInitialrecords = () => {
   const makeRow = (rowNum) => {
     return [{ value: rowNum, readOnly: true }, { value: '' }, { value: 0 }, { value: 0 }, { value: 0 }]
   };
-  const numRows = 200;
+  const numRows = 100;
 
   for (let i = 0; i < numRows; i++) {
     records.push(makeRow(i + 1))
@@ -27,11 +28,15 @@ const getInitialrecords = () => {
 
 class AppStore {
   name = "";
+  school_year = {
+    start: moment(new Date(2019, 8, 3)), // Sept 3, 2019
+    end: moment(new Date(2020, 5, 22)) // June 22, 2020
+  }
   records = getInitialrecords();
 
   setName = (value) => { this.name = value }
-  setStandards = (value) => { this.standards = value }
-  setScriptedObjectives = (value) => { this.scriptedObjectives = value }
+  setSchoolStart = (event) => { this.school_year.start = moment(event.target.value) }
+  setSchoolEnd = (event) => { this.school_year.end = moment(event.target.value) }
   setRecords = (value) => { this.records = value }
 }
 
@@ -40,8 +45,8 @@ decorate(AppStore, {
   numRows: observable,
   records: observable,
   setName: action,
-  setStandards: action,
-  setScriptedObjectives: action,
+  setSchoolStart: action,
+  setSchoolEnd: action,
   setRecords: action
 })
 
