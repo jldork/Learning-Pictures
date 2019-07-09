@@ -1,76 +1,93 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import Chart from "chart.js";
+import Plot from 'react-plotly.js';
 import Grid from '@material-ui/core/Grid';
 
-function range_generator(dataLength) {
-    let x = []; let i = 1;
-    while (x.push(i++) < dataLength) { };
-    return x
+function countvalues(a) {
+    var b = {}, i = a.length, j;
+    while (i--) {
+        j = b[a[i]];
+        b[a[i]] = j ? j + 1 : 1;
+    }
+    return b; // an object of element:count arrays
 }
 
 const Graph = inject('store')(
     observer(class Graph extends Component {
-        chartRef = React.createRef();
-        options = {
-            responsive: true,
-            scales: {
-                xAxes: [{
-                    stacked: true
-                }],
-                yAxes: [{
-                    stacked: true
-                }]
-            },
-            tooltips: {
-                mode: "index",
-                intersect: false
-            }
-        }
-        data = {
-            labels: range_generator(12),
-            datasets: [
+        render() {
+            console.log(this.props.store.schoolYearDateArray)
+
+            let objective_data = [
                 {
-                    label: 'Lesson LU',
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    borderColor: 'rgba(0,0,0,1)',
-                    borderWidth: 0.5,
-                    hoverBackgroundColor: 'rgba(0,0,0,0.8)',
-                    hoverBorderColor: 'rgba(0,0,0,1)',
-                    data: [7, 7, 7, 5, 7, 7, 7, 6, 2, 6, 7, 7]
+                    x: this.props.store.learningData.objective,
+                    y: this.props.store.records.map((row) => row[2].value),
+                    type: 'bar',
+                    marker: { color: 'black' },
+                    name: 'Lesson LU'
                 },
                 {
-                    label: 'Tactic',
-                    backgroundColor: 'rgba(255,0,0,0.5)',
-                    borderColor: 'rgba(255,0,0,1)',
-                    borderWidth: 0.5,
-                    hoverBackgroundColor: 'rgba(255,0,0,0.8)',
-                    hoverBorderColor: 'rgba(255,0,0,1)',
-                    data: [6, 5, 1, 2, 3, 4, 1, 6, 3, 6, 7, 3]
+                    x: this.props.store.learningData.objective,
+                    y: this.props.store.records.map((row) => row[3].value),
+                    type: 'bar',
+                    marker: { color: 'red' },
+                    name: 'Tactic'
                 },
                 {
-                    label: 'Protocol',
-                    backgroundColor: 'rgba(0,0,255,0.5)',
-                    borderColor: 'rgba(0,0,255,1)',
-                    borderWidth: 0.5,
-                    hoverBackgroundColor: 'rgba(0,0,255,0.8)',
-                    hoverBorderColor: 'rgba(255,0,0,1)',
-                    data: [0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 1]
+                    x: this.props.store.learningData.objective,
+                    y: this.props.store.records.map((row) => row[4].value),
+                    type: 'bar',
+                    marker: { color: 'blue' },
+                    name: 'Protocol'
+                },
+                {
+                    x: this.props.store.schoolYearDateArray.map(
+                        (momentObj) => {
+                            return momentObj.format('YYYY-MM-DD 00:00:00')
+                        }),
+                    y: new Array(this.props.store.schoolYearDateArray.length).fill(5),
+                    yaxis: 'y2',
+                    xaxis: 'x2'
                 }
             ]
-        };
-        componentDidMount() {
-            const myChartRef = this.chartRef.current.getContext("2d");
-            new Chart(myChartRef, {
-                type: 'bar',
-                data: this.data,
-                options: this.options
-            })
-        }
-        render() {
+
+            const stackedBarLayout = {
+                title: 'Student Name - Grade - Subject', barmode: 'stack',
+                xaxis: {
+                    title: {
+                        text: "Objective Number"
+                    },
+                    ticks: 'inside'
+                },
+                yaxis: {
+                    title: {
+                        text: "Learn Units to Meet an Objective"
+                    },
+                    range: [0, 30]
+                },
+                yaxis2: {
+                    title: 'yaxis2 title',
+                    overlaying: 'y',
+                    side: 'right'
+                },
+                xaxis2: {
+                    title: 'Date',
+                    overlaying: 'x',
+                    side: 'top',
+                    type: "date",
+                    tickformat: '%m/%d',
+                    nticks: 12
+                },
+                legend: {
+                    orientation: 'h', // Horizontal
+                    x: 0.25,
+                    y: 1.18
+                },
+            }
+
             return (
+
                 <Grid item>
-                    <canvas className="LearningChart" ref={this.chartRef} />
+                    <Plot data={objective_data} layout={stackedBarLayout} />
                 </Grid>
             )
         }
@@ -78,4 +95,3 @@ const Graph = inject('store')(
 );
 
 export default Graph;
-

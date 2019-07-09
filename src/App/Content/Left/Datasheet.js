@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import { toJS } from 'mobx';
 import Paper from '@material-ui/core/Paper';
 import DragAndDrop from './DragAndDrop';
 import Papa from 'papaparse';
+import moment from 'moment';
 
 import ReactDataSheet from 'react-datasheet';
 import 'react-datasheet/lib/react-datasheet.css';
@@ -11,43 +13,44 @@ const Datasheet = inject('store')(
     observer(class Datasheet extends Component {
 
         updateRecords = (changes) => {
-            let records = this.props.store.records.map(row => [...row])
+            let records = toJS(this.props.store.learningData);
             changes.forEach(({ cell, row, col, value }) => {
-                records[row][col] = { ...records[row][col], value }
+                let index = row - 1;
+                switch (col) {
+                    case 1:
+                        records.datesMet[index] = value;
+                        break;
+                    case 2:
+                        records.lessonLearnUnits[index] = value;
+                        break;
+                    case 3:
+                        records.tactic[index] = value;
+                        break;
+                    case 4:
+                        records.protocol[index] = value;
+                        break;
+                    default:
+                        console.log("Error:", cell, row, col, value);
+                }
             })
-            this.props.store.setRecords(records)
+            this.props.store.setLearningData(records)
         };
 
         handleDrop = (files) => {
-            let rowNum = 0;
-
             Papa.parse(files[0], {
                 worker: true,
-                step: (result) => {
-                    let row = result.data;
-                    let changes = [];
-                    let newVal;
+                complete: (results) => {
+                    const result_matrix = results.data;
+                    let sheetState = toJS(this.props.store.learningData);
 
-                    for (let colNum = 0; colNum < row.length; colNum++) {
-                        if (rowNum === 0) {
-                            newVal = row[colNum]
-                        } else if (colNum === 0) { //Date
-                            newVal = row[colNum]
-                        } else if (colNum === 1) { // Lesson LU
-                            newVal = parseInt(row[colNum]) || 0
-                        } else {
-                            newVal = parseInt(row[colNum]) || 0
-                        }
-                        changes.push({
-                            row: rowNum,
-                            col: colNum + 1,
-                            value: newVal
-                        })
-                    };
-
-                    this.updateRecords(changes);
-                    rowNum++;
-                },
+                    for (let i = 1; i < results.data.length; i++) {
+                        sheetState.datesMet[i - 1] = moment(result_matrix[i][0]);
+                        sheetState.lessonLearnUnits[i - 1] = result_matrix[i][1];
+                        sheetState.tactic[i - 1] = result_matrix[i][1];
+                        sheetState.protocol[i - 1] = result_matrix[i][2];
+                    }
+                    this.props.store.setLearningData(sheetState);
+                }
             })
 
         };

@@ -1,53 +1,94 @@
-import { observable, action, decorate } from "mobx";
-import * as moment from "moment";
+import { observable, action, computed, decorate, configure } from "mobx";
+import Moment from "moment";
+import { extendMoment } from 'moment-range';
 
-const getInitialrecords = () => {
-  //   Columns    
-  let records = [
-    [
-      { value: 'Obj #', readOnly: true },
-      { value: 'Date Met', readOnly: true },
-      { value: 'Lesson LU', readOnly: true },
-      { value: 'Tactic', readOnly: true },
-      { value: 'Protocol', readOnly: true }
-    ]
-  ]
+configure({ enforceActions: "observed" });	 
 
-  // Rows
-  const makeRow = (rowNum) => {
-    return [{ value: rowNum, readOnly: true }, { value: '' }, { value: 0 }, { value: 0 }, { value: 0 }]
-  };
-  const numRows = 100;
+const moment = extendMoment(Moment);
 
-  for (let i = 0; i < numRows; i++) {
-    records.push(makeRow(i + 1))
-  }
-
-  return records
+function range_generator(dataLength) {
+  let x = []; let i = 1;
+  while (x.push(i++) < dataLength) { };
+  return x
 }
 
 class AppStore {
   name = "";
-  school_year = {
+  schoolYear = {
     start: moment(new Date(2019, 8, 3)), // Sept 3, 2019
     end: moment(new Date(2020, 5, 22)) // June 22, 2020
   }
-  records = getInitialrecords();
 
+  learningData = {
+    objective: range_generator(120),
+    datesMet: new Array(120).fill(""),
+    lessonLearnUnits: new Array(120).fill(0),
+    tactic: new Array(120).fill(0),
+    protocol: new Array(120).fill(0)
+  }
+
+  // Computed Values
+  get schoolYearDateArray(){
+    const valid_dates = this.learningData.datesMet.filter(
+      moment.isMoment).filter((validMoment)=>{
+        return validMoment.isValid()
+    })
+    const moment_range = moment.range(
+      moment.min(valid_dates), 
+      moment.max(valid_dates)
+    );
+
+    return Array.from(moment_range.by('days'));
+  }
+
+  get records() {
+    //   Columns    
+    let sheetAcceptedFormat = [
+      [
+        { value: 'Obj #', readOnly: true },
+        { value: 'Date Met', readOnly: true },
+        { value: 'Lesson LU', readOnly: true },
+        { value: 'Tactic', readOnly: true },
+        { value: 'Protocol', readOnly: true }
+      ]
+    ]
+
+    // For each objective
+    for (let i = 0; i < this.learningData.objective.length; i++) {
+      let formatted_date = moment.isMoment(this.learningData.datesMet[i]) ? this.learningData.datesMet[i].format('M/DD/YYYY') : "";
+      // Add a row
+      sheetAcceptedFormat.push(
+        // in { value: moment or int } format
+        [
+          { value: this.learningData.objective[i], readOnly: true },
+          { value: formatted_date}, 
+          { value: this.learningData.lessonLearnUnits[i] }, 
+          { value: this.learningData.tactic[i] }, 
+          { value: this.learningData.protocol[i] }
+        ]
+      )
+    }
+
+    return sheetAcceptedFormat
+  }
+
+  // Setter Actions 
   setName = (value) => { this.name = value }
-  setSchoolStart = (event) => { this.school_year.start = moment(event.target.value) }
-  setSchoolEnd = (event) => { this.school_year.end = moment(event.target.value) }
-  setRecords = (value) => { this.records = value }
+  setSchoolStart = (event) => { this.schoolYear.start = moment(event.target.value) }
+  setSchoolEnd = (event) => { this.schoolYear.end = moment(event.target.value) }
+  setLearningData = (event) => { this.learningData = event }
 }
 
 decorate(AppStore, {
   name: observable,
   numRows: observable,
-  records: observable,
+  schoolYearDateArray: computed,
+  learningData: observable,
+  records: computed,
   setName: action,
   setSchoolStart: action,
   setSchoolEnd: action,
-  setRecords: action
+  setLearningData: action
 })
 
 export default new AppStore();
