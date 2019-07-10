@@ -1,21 +1,41 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
+import Moment from "moment";
 import Plot from 'react-plotly.js';
 import Grid from '@material-ui/core/Grid';
 
-function countvalues(a) {
-    var b = {}, i = a.length, j;
-    while (i--) {
-        j = b[a[i]];
-        b[a[i]] = j ? j + 1 : 1;
+function countValues(dateArray) {
+    const datesOnly = dateArray.filter(Moment.isMoment);
+    let result = {}, i = datesOnly.length, tempCount;
+    while (i--) { // iterate from back to forward
+        tempCount = result[datesOnly[i]]; // get the current count of this date
+        result[datesOnly[i]] = tempCount ? tempCount + 1 : 1;
     }
-    return b; // an object of element:count arrays
+    return result;
 }
 
 const Graph = inject('store')(
     observer(class Graph extends Component {
         render() {
-            console.log(this.props.store.schoolYearDateArray)
+
+            const dateAxis = this.props.store.schoolYearDateArray.map(
+                (momentObj) => {
+                    return momentObj.format('YYYY-MM-DD 00:00:00')
+                })
+
+            const dateCounts = (() => {
+                let defaultCounts = new Array(dateAxis.length).fill(0);
+                const counts = countValues(this.props.store.learningData.datesMet);
+                for(let date in counts){
+                    let reformatted = Moment(date).format('YYYY-MM-DD 00:00:00')
+                    defaultCounts[dateAxis.indexOf(reformatted)] = counts[date]
+                }
+                return defaultCounts
+            })()
+
+            const cumulativeDateCounts = dateCounts.map((count, index)=>{
+                return dateCounts.slice(0,index+1).reduce((a,b)=>a+b) 
+            })
 
             let objective_data = [
                 {
@@ -40,15 +60,17 @@ const Graph = inject('store')(
                     name: 'Protocol'
                 },
                 {
-                    x: this.props.store.schoolYearDateArray.map(
-                        (momentObj) => {
-                            return momentObj.format('YYYY-MM-DD 00:00:00')
-                        }),
-                    y: new Array(this.props.store.schoolYearDateArray.length).fill(5),
+                    x: dateAxis,
+                    y: cumulativeDateCounts,
                     yaxis: 'y2',
-                    xaxis: 'x2'
+                    xaxis: 'x2',
+                    name: 'Cumulative Objectives',
+                    marker: {color: 'green'},
+                    type: 'line'
                 }
             ]
+
+            const objectiveRange = this.props.store.learningData.datesMet.filter((date)=>date!=="").length
 
             const stackedBarLayout = {
                 title: 'Student Name - Grade - Subject', barmode: 'stack',
@@ -56,7 +78,7 @@ const Graph = inject('store')(
                     title: {
                         text: "Objective Number"
                     },
-                    ticks: 'inside'
+                    range: [0,objectiveRange*1.1]
                 },
                 yaxis: {
                     title: {
@@ -65,17 +87,21 @@ const Graph = inject('store')(
                     range: [0, 30]
                 },
                 yaxis2: {
-                    title: 'yaxis2 title',
+                    title: 'Cumulative Objectives Met',
                     overlaying: 'y',
-                    side: 'right'
+                    side: 'right',
+                    range: [0, objectiveRange*1.1]
                 },
                 xaxis2: {
-                    title: 'Date',
                     overlaying: 'x',
                     side: 'top',
                     type: "date",
-                    tickformat: '%m/%d',
-                    nticks: 12
+                    tickformat: '%d-%b',
+                    nticks: 13,
+                    range: [
+                        this.props.store.schoolYear.start.format('YYYY-MM-DD 00:00:00'),
+                        this.props.store.schoolYear.end.format('YYYY-MM-DD 00:00:00')
+                    ]
                 },
                 legend: {
                     orientation: 'h', // Horizontal

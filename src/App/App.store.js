@@ -82,6 +82,7 @@ class AppStore {
 decorate(AppStore, {
   name: observable,
   numRows: observable,
+  schoolYear: observable,
   schoolYearDateArray: computed,
   learningData: observable,
   records: computed,
