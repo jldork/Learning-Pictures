@@ -13,8 +13,13 @@ body {
 #content-left {
   background-color: #1F2E56;
   padding: 10px;
-  min-width: 20%;
+  min-width: 40%;
   min-height: 1000px;
+}
+
+.form-title {
+  margin: 0;
+  text-align: center;
 }
 
 .form-container {
@@ -22,6 +27,30 @@ body {
   margin-bottom: 10px;
 }
 
+.form-container .MuiGrid-root {
+  margin-top: 10px;
+}
+
+.form-container.MuiPaper-root{
+  padding-top: 5px;
+}
+
+.MuiFormControl-root{
+  width:100%;
+}
+
+.form-container .MuiTextField-root {
+  width: 50%;
+}
+
+.form-container .student-name {
+  width:100%;
+}
+
+.datasheet-title {
+  text-align: center;
+  margin-top: 0;
+}
 .sheet-container {
   padding: 10px;
 }

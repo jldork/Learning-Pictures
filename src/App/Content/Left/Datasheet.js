@@ -59,6 +59,7 @@ const Datasheet = inject('store')(
             const sheetData = this.props.store.records;
             return (
                 <Paper square={true} className="sheet-container">
+                    <h3 className="datasheet-title">Learning Data</h3>
                     <DragAndDrop handleDrop={this.handleDrop}>
                         <ReactDataSheet
                             data={sheetData}
