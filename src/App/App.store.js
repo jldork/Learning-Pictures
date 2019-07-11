@@ -13,7 +13,10 @@ function range_generator(dataLength) {
 }
 
 class AppStore {
-  name = "";
+  name = "Student Name";
+  grade = "Grade";
+  subject = "Subject";
+
   schoolYear = {
     start: moment(new Date(2019, 8, 3)), // Sept 3, 2019
     end: moment(new Date(2020, 5, 22)) // June 22, 2020
@@ -73,7 +76,9 @@ class AppStore {
   }
 
   // Setter Actions 
-  setName = (value) => { this.name = value }
+  setName = (event) => { this.name = event.target.value }
+  setGrade = (event) => { this.grade = event.target.value }
+  setSubject = (event) => { this.subject = event.target.value }
   setSchoolStart = (event) => { this.schoolYear.start = moment(event.target.value) }
   setSchoolEnd = (event) => { this.schoolYear.end = moment(event.target.value) }
   setLearningData = (event) => { this.learningData = event }
@@ -81,12 +86,16 @@ class AppStore {
 
 decorate(AppStore, {
   name: observable,
+  grade: observable,
+  subject: observable,
   numRows: observable,
   schoolYear: observable,
   schoolYearDateArray: computed,
   learningData: observable,
   records: computed,
   setName: action,
+  setGrade: action,
+  setSubject: action,
   setSchoolStart: action,
   setSchoolEnd: action,
   setLearningData: action

@@ -17,9 +17,15 @@ body {
   min-height: 1000px;
 }
 
+.form-container {
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
 .sheet-container {
   padding: 10px;
 }
+
 .data-grid-container .data-grid .cell {
   min-width: 5%;
   text-align: center;

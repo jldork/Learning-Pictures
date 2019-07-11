@@ -11,8 +11,8 @@ const Content = inject('store')(
         render() {
             return (
                 <Grid container id="content-container">
-                    <Grid item id="content-left" ><Datasheet /></Grid>
-                    <Grid item id="content-right" ><DateForm/><Graph /></Grid>
+                    <Grid item id="content-left" ><DateForm/><Datasheet /></Grid>
+                    <Grid item id="content-right" ><Graph /></Grid>
                 </Grid>
             )
         }

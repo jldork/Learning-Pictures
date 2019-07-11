@@ -73,7 +73,7 @@ const Graph = inject('store')(
             const objectiveRange = this.props.store.learningData.datesMet.filter((date)=>date!=="").length
 
             const stackedBarLayout = {
-                title: 'Student Name - Grade - Subject', barmode: 'stack',
+                title: [this.props.store.name, this.props.store.grade, this.props.store.subject].join(' - '), barmode: 'stack',
                 xaxis: {
                     title: {
                         text: "Objective Number"
@@ -96,7 +96,7 @@ const Graph = inject('store')(
                     overlaying: 'x',
                     side: 'top',
                     type: "date",
-                    tickformat: '%d-%b',
+                    tickformat: '%b',
                     nticks: 13,
                     range: [
                         this.props.store.schoolYear.start.format('YYYY-MM-DD 00:00:00'),
