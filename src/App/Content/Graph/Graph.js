@@ -17,6 +17,9 @@ function countValues(dateArray) {
 const Graph = inject('store')(
     observer(class Graph extends Component {
         render() {
+            function getColumn(df, colName){
+                return df.select(colName).toArray().map((row)=>row[0])
+            };
 
             const dateAxis = this.props.store.schoolYearDateArray.map(
                 (momentObj) => {
@@ -25,7 +28,8 @@ const Graph = inject('store')(
 
             const dateCounts = (() => {
                 let defaultCounts = new Array(dateAxis.length).fill(0);
-                const counts = countValues(this.props.store.learningData.datesMet);
+                let datesMetDf = getColumn(this.props.store.learningData, 'DATES MET')
+                const counts = countValues(datesMetDf);
                 for(let date in counts){
                     let reformatted = Moment(date).format('YYYY-MM-DD 00:00:00')
                     defaultCounts[dateAxis.indexOf(reformatted)] = counts[date]
@@ -37,24 +41,27 @@ const Graph = inject('store')(
                 return dateCounts.slice(0,index+1).reduce((a,b)=>a+b) 
             })
 
+            const graphData = this.props.store.learningData;
+            const objectives = getColumn(graphData,'OBJECTIVE'); 
+
             let objective_data = [
                 {
-                    x: this.props.store.learningData.objective,
-                    y: this.props.store.records.map((row) => row[2].value),
+                    x: objectives,
+                    y: getColumn(graphData,'LESSON LU'),
                     type: 'bar',
                     marker: { color: 'black' },
                     name: 'Lesson LU'
                 },
                 {
-                    x: this.props.store.learningData.objective,
-                    y: this.props.store.records.map((row) => row[3].value),
+                    x: objectives,
+                    y: getColumn(graphData,'TACTIC'),
                     type: 'bar',
                     marker: { color: 'red' },
                     name: 'Tactic'
                 },
                 {
-                    x: this.props.store.learningData.objective,
-                    y: this.props.store.records.map((row) => row[4].value),
+                    x: objectives,
+                    y: getColumn(graphData,'PROTOCOL'),
                     type: 'bar',
                     marker: { color: 'blue' },
                     name: 'Protocol'
@@ -70,27 +77,35 @@ const Graph = inject('store')(
                 }
             ]
 
-            const objectiveRange = this.props.store.learningData.datesMet.filter((date)=>date!=="").length
+            const objectiveRange = graphData.select('LESSON LU', 'TACTIC','PROTOCOL').toArray().reduce((max, row)=>{
+                const LU = parseInt(row[0]) || 0
+                const TA = parseInt(row[1]) || 0
+                const PR = parseInt(row[2]) || 0
+                const total = LU + TA + PR
+                return Math.max(total, max || 0)
+            })
 
+            const totalObjectives = getColumn(graphData,'LESSON LU').filter(lu => lu > 0)
+            
             const stackedBarLayout = {
                 title: [this.props.store.name, this.props.store.grade, this.props.store.subject].join(' - '), barmode: 'stack',
                 xaxis: {
                     title: {
                         text: "Objective Number"
                     },
-                    range: [0,objectiveRange*1.1]
+                    range: [0,totalObjectives.length*1.1]
                 },
                 yaxis: {
                     title: {
                         text: "Learn Units to Meet an Objective"
                     },
-                    range: [0, 30]
+                    range: [0, objectiveRange*1.2]
                 },
                 yaxis2: {
                     title: 'Cumulative Objectives Met',
                     overlaying: 'y',
                     side: 'right',
-                    range: [0, objectiveRange*1.1]
+                    range: [0, Math.max(...cumulativeDateCounts)*1.2]
                 },
                 xaxis2: {
                     overlaying: 'x',

@@ -1,13 +1,14 @@
 import { observable, action, computed, decorate, configure } from "mobx";
 import Moment from "moment";
 import { extendMoment } from 'moment-range';
+import DataFrame from'dataframe-js';
 
 configure({ enforceActions: "observed" });	 
 
 const moment = extendMoment(Moment);
 
 function range_generator(dataLength) {
-  let x = []; let i = 1;
+  let x = []; let i = 0;
   while (x.push(i++) < dataLength) { };
   return x
 }
@@ -16,32 +17,23 @@ class AppStore {
   name = "Student Name";
   grade = "Grade";
   subject = "Subject";
+  columns = ['OBJECTIVE', 'DESCRIPTION', 'DATES MET', 'LESSON LU', 'TACTIC', 'PROTOCOL']
 
   schoolYear = {
     start: moment(new Date(2019, 8, 3)), // Sept 3, 2019
     end: moment(new Date(2020, 5, 22)) // June 22, 2020
   }
 
-  learningData = {
-    objective: range_generator(120),
-    datesMet: new Array(120).fill(""),
-    lessonLearnUnits: new Array(120).fill(0),
-    tactic: new Array(120).fill(0),
-    protocol: new Array(120).fill(0)
-  }
+  learningData = new DataFrame(
+    range_generator(120).map((i)=>[i+1, "", "", 0, 0, 0]), this.columns
+  )
 
   // Computed Values
   get schoolYearDateArray(){
-    const valid_dates = this.learningData.datesMet.filter(
-      moment.isMoment).filter((validMoment)=>{
-        return validMoment.isValid()
-    })
-    const moment_range = moment.range(
-      moment.min(valid_dates), 
-      moment.max(valid_dates)
-    );
-
-    return Array.from(moment_range.by('days'));
+    return Array.from(moment.range(
+      this.schoolYear.start, 
+      this.schoolYear.end
+    ).by('days'));
   }
 
   get records() {
@@ -49,6 +41,7 @@ class AppStore {
     let sheetAcceptedFormat = [
       [
         { value: 'Obj #', readOnly: true },
+        { value: 'Description', readOnly: true},
         { value: 'Date Met', readOnly: true },
         { value: 'Lesson LU', readOnly: true },
         { value: 'Tactic', readOnly: true },
@@ -56,21 +49,20 @@ class AppStore {
       ]
     ]
 
-    // For each objective
-    for (let i = 0; i < this.learningData.objective.length; i++) {
-      let formatted_date = moment.isMoment(this.learningData.datesMet[i]) ? this.learningData.datesMet[i].format('M/DD/YYYY') : "";
+    this.learningData.toArray().forEach((row)=>{ 
       // Add a row
       sheetAcceptedFormat.push(
         // in { value: moment or int } format
         [
-          { value: this.learningData.objective[i], readOnly: true },
-          { value: formatted_date}, 
-          { value: this.learningData.lessonLearnUnits[i] }, 
-          { value: this.learningData.tactic[i] }, 
-          { value: this.learningData.protocol[i] }
+          { value: parseInt(row[0]) || 0, readOnly: true }, // Objective #
+          { value: row[1]}, // Description
+          { value: moment.isMoment(row[2]) ? row[2].format('M/DD/YYYY') : row[2]}, // Date Met 
+          { value: parseInt(row[3]) || 0}, // Lesson LU
+          { value: parseInt(row[4]) || 0}, // Tactic
+          { value: parseInt(row[5]) || 0}  // Protocol
         ]
-      )
-    }
+      ) 
+    })
 
     return sheetAcceptedFormat
   }
