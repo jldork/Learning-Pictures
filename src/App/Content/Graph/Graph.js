@@ -4,16 +4,6 @@ import Moment from "moment";
 import Plot from 'react-plotly.js';
 import Grid from '@material-ui/core/Grid';
 
-function countValues(dateArray) {
-    const datesOnly = dateArray.filter(Moment.isMoment);
-    let result = {}, i = datesOnly.length, tempCount;
-    while (i--) { // iterate from back to forward
-        tempCount = result[datesOnly[i]]; // get the current count of this date
-        result[datesOnly[i]] = tempCount ? tempCount + 1 : 1;
-    }
-    return result;
-}
-
 const Graph = inject('store')(
     observer(class Graph extends Component {
         render() {
@@ -29,8 +19,18 @@ const Graph = inject('store')(
             const dateCounts = (() => {
                 let defaultCounts = new Array(dateAxis.length).fill(0);
                 let datesMetDf = getColumn(this.props.store.learningData, 'DATES MET')
-                const counts = countValues(datesMetDf);
-                for(let date in counts){
+
+                function countValues(dateArray) {
+                    const datesOnly = dateArray.filter(Moment.isMoment);
+                    let result = {}, i = datesOnly.length, tempCount;
+                    while (i--) { // iterate from back to forward
+                        tempCount = result[datesOnly[i]]; // get the current count of this date
+                        result[datesOnly[i]] = tempCount ? tempCount + 1 : 1;
+                    }
+                    return result;
+                }
+                
+                for(let date in countValues(datesMetDf)){
                     let reformatted = Moment(date).format('YYYY-MM-DD 00:00:00')
                     defaultCounts[dateAxis.indexOf(reformatted)] = counts[date]
                 }
