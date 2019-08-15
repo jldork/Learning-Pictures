@@ -29,10 +29,12 @@ const Graph = inject('store')(
                     }
                     return result;
                 }
+
+                const dateCounts = countValues(datesMetDf)
                 
-                for(let date in countValues(datesMetDf)){
+                for(let date in dateCounts){
                     let reformatted = Moment(date).format('YYYY-MM-DD 00:00:00')
-                    defaultCounts[dateAxis.indexOf(reformatted)] = counts[date]
+                    defaultCounts[dateAxis.indexOf(reformatted)] = dateCounts[date]
                 }
                 return defaultCounts
             })()
