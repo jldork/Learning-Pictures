@@ -9,7 +9,7 @@
     "mobx": "^5.10.1",
     "mobx-react": "^6.1.1",
     "mobx-utils": "^5.4.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "moment-range": "^4.0.2",
     "papaparse": "^5.0.0",
     "plotly.js": "^1.48.3",
